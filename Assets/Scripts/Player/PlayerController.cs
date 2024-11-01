@@ -1,4 +1,4 @@
-using Unity.VisualScripting;
+using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -20,6 +20,8 @@ public class PlayerController : MonoBehaviour
     private Vector2 mouseDelta;
     private float cameraXRot;
 
+    public Action optionAction;
+
     private void Awake()
     {
         rb = GetComponent<Rigidbody>();
@@ -27,7 +29,7 @@ public class PlayerController : MonoBehaviour
 
     void Start()
     {
-        CharacterManager.Instance.Player.controller = this;
+        Cursor.lockState = CursorLockMode.Locked;
     }
 
     void FixedUpdate()
@@ -101,5 +103,22 @@ public class PlayerController : MonoBehaviour
             }
         }
         return false;
+    }
+
+    public void OnOption(InputAction.CallbackContext context)
+    {
+        if(context.phase == InputActionPhase.Started)
+        {
+            optionAction?.Invoke();
+            ToggleCursor();
+        }
+    }
+
+    private void ToggleCursor()
+    {
+        // None -> 0, Locked -> 1
+        bool toggle = Cursor.lockState == CursorLockMode.Locked;
+        Cursor.lockState = toggle ? CursorLockMode.None : CursorLockMode.Locked;
+        canLook = !toggle;
     }
 }
